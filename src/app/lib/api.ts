@@ -13,3 +13,20 @@ export async function postAuth(email: string) {
 
   return res.json(); // should return { token: "..." }
 }
+
+export async function getProducts(token: string) {
+  const res = await fetch(`${API_BASE_URL}/products`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!res.ok) {
+    let message = 'Failed to load products';
+    try {
+      const err = await res.json();
+      if (typeof err?.message === 'string') message = err.message;
+    } catch {}
+    throw new Error(message);
+  }
+
+  return res.json();
+}

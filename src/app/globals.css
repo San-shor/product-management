@@ -1,1 +1,16 @@
 @import 'tailwindcss';
+
+:root {
+  --color-text: #0d1821;
+  --color-bg: #eff1f3;
+  --color-primary: #4e6e5d;
+  --color-accent: #ad8a64;
+  --color-danger: #a44a3f;
+  --color-surface: #ffffff;
+}
+
+html,
+body {
+  color: var(--color-text);
+  background: var(--color-bg);
+}
