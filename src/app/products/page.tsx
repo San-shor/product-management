@@ -14,6 +14,8 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [offset, setOffset] = useState(0);
+  const [limit] = useState(9);
 
   useEffect(() => {
     if (!token) {
@@ -24,7 +26,7 @@ export default function ProductsPage() {
       setLoading(true);
       setError(null);
       try {
-        const data = await getProducts(token);
+        const data = await getProducts(token, { offset, limit });
         setProducts(data);
       } catch (e: any) {
         setError(e.message ?? 'Error');
@@ -32,7 +34,7 @@ export default function ProductsPage() {
         setLoading(false);
       }
     })();
-  }, [token, router]);
+  }, [token, router, offset, limit]);
   console.log(products);
   const handleLogout = () => {
     dispatch(logout());
@@ -91,6 +93,21 @@ export default function ProductsPage() {
             No products found.
           </div>
         )}
+
+        <div className='mt-6 flex items-center justify-between'>
+          <button
+            disabled={offset === 0 || loading}
+            onClick={() => setOffset(Math.max(0, offset - limit))}
+            className='px-3 py-2 rounded-md border bg-[var(--color-primary)] text-white disabled:opacity-50'>
+            Previous
+          </button>
+          <button
+            disabled={loading || products.length < limit}
+            onClick={() => setOffset(offset + limit)}
+            className='px-3 py-2 rounded-md border bg-[var(--color-primary)] text-white disabled:opacity-50'>
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );

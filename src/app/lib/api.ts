@@ -16,8 +16,19 @@ export async function postAuth(email: string) {
 
 import type { Product } from '@/types/product';
 
-export async function getProducts(token: string): Promise<Product[]> {
-  const res = await fetch(`${API_BASE_URL}/products`, {
+export async function getProducts(
+  token: string,
+  opts?: { offset?: number; limit?: number }
+): Promise<Product[]> {
+  const params = new URLSearchParams();
+  if (opts?.offset !== undefined) params.set('offset', String(opts.offset));
+  if (opts?.limit !== undefined) params.set('limit', String(opts.limit));
+  const qs = params.toString();
+  const url = qs
+    ? `${API_BASE_URL}/products?${qs}`
+    : `${API_BASE_URL}/products`;
+
+  const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
