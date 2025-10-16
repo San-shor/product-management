@@ -18,15 +18,20 @@ import type { Product } from '@/types/product';
 
 export async function getProducts(
   token: string,
-  opts?: { offset?: number; limit?: number }
+  opts?: { offset?: number; limit?: number; searchedText?: string }
 ): Promise<Product[]> {
   const params = new URLSearchParams();
   if (opts?.offset !== undefined) params.set('offset', String(opts.offset));
   if (opts?.limit !== undefined) params.set('limit', String(opts.limit));
+  if (opts?.searchedText && opts.searchedText.trim().length > 0) {
+    params.set('searchedText', opts.searchedText.trim());
+  }
   const qs = params.toString();
-  const url = qs
-    ? `${API_BASE_URL}/products?${qs}`
-    : `${API_BASE_URL}/products`;
+  const base =
+    opts?.searchedText && opts.searchedText.trim().length > 0
+      ? `${API_BASE_URL}/products/search`
+      : `${API_BASE_URL}/products`;
+  const url = qs ? `${base}?${qs}` : base;
 
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },

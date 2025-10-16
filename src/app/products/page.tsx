@@ -16,6 +16,15 @@ export default function ProductsPage() {
   const [error, setError] = useState<string | null>(null);
   const [offset, setOffset] = useState(0);
   const [limit] = useState(9);
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500);
+    return () => clearTimeout(id);
+  }, [search]);
 
   useEffect(() => {
     if (!token) {
@@ -26,7 +35,9 @@ export default function ProductsPage() {
       setLoading(true);
       setError(null);
       try {
-        const data = await getProducts(token, { offset, limit });
+        const data = await (debouncedSearch.trim().length > 0
+          ? getProducts(token, { searchedText: debouncedSearch })
+          : getProducts(token, { offset, limit }));
         setProducts(data);
       } catch (e: any) {
         setError(e.message ?? 'Error');
@@ -34,7 +45,7 @@ export default function ProductsPage() {
         setLoading(false);
       }
     })();
-  }, [token, router, offset, limit]);
+  }, [token, router, offset, limit, debouncedSearch]);
   console.log(products);
   const handleLogout = () => {
     dispatch(logout());
@@ -55,6 +66,11 @@ export default function ProductsPage() {
             <input
               type='text'
               placeholder='Search products...'
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setOffset(0);
+              }}
               className='px-4 py-2 rounded-md border border-[color:var(--color-accent)]/40 focus:outline-none w-full sm:w-60'
             />
             <button
@@ -94,20 +110,22 @@ export default function ProductsPage() {
           </div>
         )}
 
-        <div className='mt-6 flex items-center justify-between'>
-          <button
-            disabled={offset === 0 || loading}
-            onClick={() => setOffset(Math.max(0, offset - limit))}
-            className='px-3 py-2 rounded-md border bg-[var(--color-primary)] text-white disabled:opacity-50'>
-            Previous
-          </button>
-          <button
-            disabled={loading || products.length < limit}
-            onClick={() => setOffset(offset + limit)}
-            className='px-3 py-2 rounded-md border bg-[var(--color-primary)] text-white disabled:opacity-50'>
-            Next
-          </button>
-        </div>
+        {debouncedSearch.trim().length === 0 && (
+          <div className='mt-6 flex items-center justify-between'>
+            <button
+              disabled={offset === 0 || loading}
+              onClick={() => setOffset(Math.max(0, offset - limit))}
+              className='px-3 py-2 rounded-md border bg-[var(--color-primary)] text-white disabled:opacity-50'>
+              Previous
+            </button>
+            <button
+              disabled={loading || products.length < limit}
+              onClick={() => setOffset(offset + limit)}
+              className='px-3 py-2 rounded-md border bg-[var(--color-primary)] text-white disabled:opacity-50'>
+              Next
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
