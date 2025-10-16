@@ -14,7 +14,9 @@ export async function postAuth(email: string) {
   return res.json(); // should return { token: "..." }
 }
 
-export async function getProducts(token: string) {
+import type { Product } from '@/types/product';
+
+export async function getProducts(token: string): Promise<Product[]> {
   const res = await fetch(`${API_BASE_URL}/products`, {
     headers: { Authorization: `Bearer ${token}` },
   });

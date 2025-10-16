@@ -4,13 +4,14 @@ import { useAppSelector, useAppDispatch } from '../lib/redux/store';
 import { logout } from '../lib/redux/features/authSlice';
 import { useRouter } from 'next/navigation';
 import { getProducts } from '../lib/api';
-import ProductCard from './ProductCard';
+import ProductCard from '../components/ProductCard';
+import type { Product } from '@/types/product';
 
 export default function ProductsPage() {
   const token = useAppSelector((s) => s.auth.token);
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,20 +44,20 @@ export default function ProductsPage() {
   return (
     <div className='min-h-screen bg-[var(--color-bg)] px-6 py-10'>
       <div className='max-w-5xl mx-auto bg-[var(--color-surface)] rounded-xl p-6 shadow border border-[color:var(--color-bg)]'>
-        <div className='flex justify-between items-center mb-6'>
+        <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4 mb-6'>
           <h1 className='text-2xl font-semibold text-[var(--color-text)]'>
             Products
           </h1>
 
-          <div className='flex gap-3'>
+          <div className='flex w-full sm:w-auto gap-3'>
             <input
               type='text'
               placeholder='Search products...'
-              className='px-4 py-2 rounded-md border border-[color:var(--color-accent)]/40 focus:outline-none w-60'
+              className='px-4 py-2 rounded-md border border-[color:var(--color-accent)]/40 focus:outline-none w-full sm:w-60'
             />
             <button
               onClick={handleLogout}
-              className='px-3 py-2 rounded-md bg-[var(--color-accent)] text-white hover:brightness-95'>
+              className='px-3 py-2 rounded-md bg-[var(--color-accent)] text-white hover:brightness-95 shrink-0'>
               Logout
             </button>
           </div>
@@ -75,13 +76,11 @@ export default function ProductsPage() {
         {error && <p className='text-[var(--color-danger)]'>{error}</p>}
         {!loading && !error && Array.isArray(products) && (
           <div className='mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
-            {products.map((p: any, idx: number) => (
+            {products.map((p: Product, idx: number) => (
               <ProductCard
                 key={idx}
                 product={p}
-                onDetailsClick={() =>
-                  alert(String(p?.name ?? p?.title ?? 'Product'))
-                }
+                onDetailsClick={() => alert(String(p.name))}
               />
             ))}
           </div>

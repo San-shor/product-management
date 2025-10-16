@@ -1,10 +1,11 @@
 'use client';
 import React from 'react';
 import Image from 'next/image';
+import type { Product } from '@/types/product';
 
 type ProductCardProps = {
-  product: any;
-  onDetailsClick?: (product: any) => void;
+  product: Product;
+  onDetailsClick?: (product: Product) => void;
 };
 
 export default function ProductCard({
@@ -13,15 +14,19 @@ export default function ProductCard({
 }: ProductCardProps) {
   return (
     <div className='rounded-xl overflow-hidden border border-[color:var(--color-accent)]/30 bg-white/80 backdrop-blur hover:shadow-sm hover:-translate-y-0.5 transition'>
-      <div className='aspect-[4/3] bg-[var(--color-bg)]'>
+      <div className='relative aspect-[4/3] bg-[var(--color-bg)]'>
         {Array.isArray(product.images) &&
           product.images.length > 0 &&
+          typeof product.images[0] === 'string' &&
           product.images[0].length > 0 && (
             <Image
               src={product.images[0]}
-              alt={'sanjida'}
-              width={200}
-              height={200}
+              alt={String(product.name || 'Product image')}
+              fill
+              sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
+              className='object-cover'
+              priority={false}
+              unoptimized
             />
           )}
       </div>
@@ -32,7 +37,7 @@ export default function ProductCard({
             {product.name}
           </div>
           <span className='shrink-0 text-xs px-2 py-0.5 rounded-full bg-[var(--color-accent)]/15 text-[var(--color-text)]'>
-            {product.category.name}
+            {product?.category?.name ?? '—'}
           </span>
         </div>
 
@@ -47,7 +52,7 @@ export default function ProductCard({
             Details
           </button>
           <span className='inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[var(--color-accent)]/20 text-[var(--color-text)] text-sm'>
-            {product.price}
+            {String(product?.price ?? '')}
           </span>
         </div>
       </div>
