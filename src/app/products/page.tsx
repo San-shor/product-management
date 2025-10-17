@@ -8,14 +8,13 @@ import ProductCard from '../components/ProductCard';
 import ProductSkeleton from '../components/ProductSkeleton';
 import ConfirmationModal from '../components/ConfirmationModal';
 import type { Product } from '@/types/product';
+import { useGetProductsQuery } from '@/services/product';
 
 export default function ProductsPage() {
   const token = useAppSelector((s) => s.auth.token);
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [offset, setOffset] = useState(0);
   const [limit] = useState(9);
   const [search, setSearch] = useState('');
@@ -42,21 +41,17 @@ export default function ProductsPage() {
       router.replace('/login');
       return;
     }
-    (async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await (debouncedSearch.trim().length > 0
-          ? getProducts(token, { searchedText: debouncedSearch })
-          : getProducts(token, { offset, limit }));
-        setProducts(data);
-      } catch (e: any) {
-        setError(e.message ?? 'Error');
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [token, router, offset, limit, debouncedSearch]);
+  }, [token, router]);
+
+  const { data, error, isLoading } = useGetProductsQuery({
+    offset,
+    limit,
+    searchedText: debouncedSearch,
+  });
+
+  useEffect(() => {
+    setProducts(data || []);
+  }, [data]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -91,7 +86,6 @@ export default function ProductsPage() {
         isDeleting: false,
       });
     } catch (e: any) {
-      setError(e.message ?? 'Failed to delete product');
       setDeleteModal((prev) => ({ ...prev, isDeleting: false }));
     }
   };
@@ -138,9 +132,9 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        {loading && <ProductSkeleton count={6} />}
-        {error && <p className='text-[var(--color-danger)]'>{error}</p>}
-        {!loading && !error && Array.isArray(products) && (
+        {isLoading && <ProductSkeleton count={6} />}
+        {/* {error && <p className='text-[var(--color-danger)]'>{error.data}</p>} */}
+        {!isLoading && !error && Array.isArray(products) && (
           <div className='mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
             {products.map((p: Product, idx: number) => (
               <ProductCard
@@ -158,7 +152,7 @@ export default function ProductsPage() {
           </div>
         )}
 
-        {!loading && !error && products.length === 0 && (
+        {!isLoading && error && products?.length === 0 && (
           <div className='mt-10 text-center text-sm opacity-70'>
             No products found.
           </div>
@@ -167,13 +161,13 @@ export default function ProductsPage() {
         {debouncedSearch.trim().length === 0 && (
           <div className='mt-6 flex items-center justify-between'>
             <button
-              disabled={offset === 0 || loading}
+              disabled={offset === 0 || isLoading}
               onClick={() => setOffset(Math.max(0, offset - limit))}
               className='px-3 py-2 rounded-md border bg-[var(--color-primary)] text-white disabled:opacity-50'>
               Previous
             </button>
             <button
-              disabled={loading || products.length < limit}
+              disabled={isLoading}
               onClick={() => setOffset(offset + limit)}
               className='px-3 py-2 rounded-md border bg-[var(--color-primary)] text-white disabled:opacity-50'>
               Next

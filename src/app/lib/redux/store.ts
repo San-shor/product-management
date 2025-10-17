@@ -2,13 +2,20 @@ import { configureStore } from '@reduxjs/toolkit';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 
 import authReducer from './features/authSlice';
+import { productApi } from '@/services/product';
+import { setupListeners } from '@reduxjs/toolkit/query';
+
+export const store = configureStore({
+  reducer: {
+    auth: authReducer,
+    [productApi.reducerPath]: productApi.reducer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(productApi.middleware),
+});
 
 export const makeStore = () => {
-  return configureStore({
-    reducer: {
-      auth: authReducer,
-    },
-  });
+  return store;
 };
 
 // Infer the type of makeStore
@@ -19,3 +26,5 @@ export type AppDispatch = AppStore['dispatch'];
 
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
+
+setupListeners(store.dispatch);
