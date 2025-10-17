@@ -146,7 +146,9 @@ export default function ProductsPage() {
               <ProductCard
                 key={idx}
                 product={p}
-                onDetailsClick={() => alert(String(p.name))}
+                onDetailsClick={(prod) =>
+                  router.push(`/products/${prod.slug}/details`)
+                }
                 onDeleteClick={handleDeleteClick}
                 onEditClick={(prod) =>
                   router.push(`/products/${prod.slug}/edit`)
