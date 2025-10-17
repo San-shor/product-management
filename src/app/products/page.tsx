@@ -3,17 +3,21 @@ import { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../lib/redux/store';
 import { logout } from '../lib/redux/features/authSlice';
 import { useRouter } from 'next/navigation';
-import { getProducts, deleteProduct } from '../lib/api';
 import ProductCard from '../components/ProductCard';
 import ProductSkeleton from '../components/ProductSkeleton';
 import ConfirmationModal from '../components/ConfirmationModal';
 import type { Product } from '@/types/product';
-import { useGetProductsQuery } from '@/services/product';
+import {
+  useGetProductsQuery,
+  useDeleteProductMutation,
+} from '@/services/product';
 
 export default function ProductsPage() {
   const token = useAppSelector((s) => s.auth.token);
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const [deleteProductMutation, { isLoading: isDeleting }] =
+    useDeleteProductMutation();
   const [products, setProducts] = useState<Product[]>([]);
   const [offset, setOffset] = useState(0);
   const [limit] = useState(9);
@@ -22,11 +26,9 @@ export default function ProductsPage() {
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
     product: Product | null;
-    isDeleting: boolean;
   }>({
     isOpen: false,
     product: null,
-    isDeleting: false,
   });
 
   useEffect(() => {
@@ -62,7 +64,6 @@ export default function ProductsPage() {
     setDeleteModal({
       isOpen: true,
       product,
-      isDeleting: false,
     });
   };
 
@@ -72,7 +73,7 @@ export default function ProductsPage() {
     setDeleteModal((prev) => ({ ...prev, isDeleting: true }));
 
     try {
-      await deleteProduct(token, deleteModal.product.id);
+      await deleteProductMutation(deleteModal.product.id).unwrap();
 
       // Remove the product from the local state
       setProducts((prev) =>
@@ -83,7 +84,6 @@ export default function ProductsPage() {
       setDeleteModal({
         isOpen: false,
         product: null,
-        isDeleting: false,
       });
     } catch (e: any) {
       setDeleteModal((prev) => ({ ...prev, isDeleting: false }));
@@ -94,7 +94,6 @@ export default function ProductsPage() {
     setDeleteModal({
       isOpen: false,
       product: null,
-      isDeleting: false,
     });
   };
 
@@ -185,7 +184,7 @@ export default function ProductsPage() {
         message={`Are you sure you want to delete "${deleteModal.product?.name}"? This action cannot be undone.`}
         confirmText='Delete'
         cancelText='Cancel'
-        isLoading={deleteModal.isDeleting}
+        isLoading={isDeleting}
       />
     </div>
   );
