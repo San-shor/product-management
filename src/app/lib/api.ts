@@ -48,3 +48,24 @@ export async function getProducts(
 
   return res.json();
 }
+
+export async function deleteProduct(
+  token: string,
+  productId: string
+): Promise<{ id: string }> {
+  const res = await fetch(`${API_BASE_URL}/products/${productId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!res.ok) {
+    let message = 'Failed to delete product';
+    try {
+      const err = await res.json();
+      if (typeof err?.message === 'string') message = err.message;
+    } catch {}
+    throw new Error(message);
+  }
+
+  return res.json();
+}

@@ -3,9 +3,10 @@ import { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../lib/redux/store';
 import { logout } from '../lib/redux/features/authSlice';
 import { useRouter } from 'next/navigation';
-import { getProducts } from '../lib/api';
+import { getProducts, deleteProduct } from '../lib/api';
 import ProductCard from '../components/ProductCard';
 import ProductSkeleton from '../components/ProductSkeleton';
+import ConfirmationModal from '../components/ConfirmationModal';
 import type { Product } from '@/types/product';
 
 export default function ProductsPage() {
@@ -19,6 +20,15 @@ export default function ProductsPage() {
   const [limit] = useState(9);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean;
+    product: Product | null;
+    isDeleting: boolean;
+  }>({
+    isOpen: false,
+    product: null,
+    isDeleting: false,
+  });
 
   useEffect(() => {
     const id = setTimeout(() => {
@@ -47,10 +57,51 @@ export default function ProductsPage() {
       }
     })();
   }, [token, router, offset, limit, debouncedSearch]);
-  console.log(products);
+
   const handleLogout = () => {
     dispatch(logout());
     router.replace('/login');
+  };
+
+  const handleDeleteClick = (product: Product) => {
+    setDeleteModal({
+      isOpen: true,
+      product,
+      isDeleting: false,
+    });
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteModal.product || !token) return;
+
+    setDeleteModal((prev) => ({ ...prev, isDeleting: true }));
+
+    try {
+      await deleteProduct(token, deleteModal.product.id);
+
+      // Remove the product from the local state
+      setProducts((prev) =>
+        prev.filter((p) => p.id !== deleteModal.product!.id)
+      );
+
+      // Close the modal
+      setDeleteModal({
+        isOpen: false,
+        product: null,
+        isDeleting: false,
+      });
+    } catch (e: any) {
+      setError(e.message ?? 'Failed to delete product');
+      setDeleteModal((prev) => ({ ...prev, isDeleting: false }));
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteModal({
+      isOpen: false,
+      product: null,
+      isDeleting: false,
+    });
   };
 
   if (!token) return null;
@@ -91,6 +142,7 @@ export default function ProductsPage() {
                 key={idx}
                 product={p}
                 onDetailsClick={() => alert(String(p.name))}
+                onDeleteClick={handleDeleteClick}
               />
             ))}
           </div>
@@ -119,6 +171,18 @@ export default function ProductsPage() {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={deleteModal.isOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title='Delete Product'
+        message={`Are you sure you want to delete "${deleteModal.product?.name}"? This action cannot be undone.`}
+        confirmText='Delete'
+        cancelText='Cancel'
+        isLoading={deleteModal.isDeleting}
+      />
     </div>
   );
 }
