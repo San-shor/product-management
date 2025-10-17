@@ -3,38 +3,22 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import ProductForm from '@/app/components/ProductForm';
-import { getProductBySlug } from '@/app/lib/api';
 import { useAppSelector } from '@/app/lib/redux/store';
 import type { Product } from '@/types/product';
+import { useGetProductBySlugQuery } from '@/services/product';
 
 export default function EditProductPage() {
   const params = useParams<{ slug: string }>();
   const productSlug = params?.slug as string;
   const token = useAppSelector((s) => s.auth.token);
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let mounted = true;
-    async function load() {
-      if (!productSlug || !token) return;
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await getProductBySlug(token, productSlug);
-        if (mounted) setProduct(data);
-      } catch (err: any) {
-        if (mounted) setError(err?.message || 'Failed to load product');
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    }
-    load();
-    return () => {
-      mounted = false;
-    };
-  }, [productSlug, token]);
+  const {
+    data: product,
+    isLoading: loading,
+    error,
+  } = useGetProductBySlugQuery(productSlug, {
+    skip: !productSlug || !token,
+  });
 
   if (!productSlug)
     return (
@@ -56,7 +40,9 @@ export default function EditProductPage() {
     return (
       <div className='min-h-screen bg-[var(--color-bg)] px-6 py-10'>
         <div className='max-w-5xl mx-auto bg-[var(--color-surface)] rounded-xl p-6 shadow border border-[color:var(--color-bg)]'>
-          <div className='text-[var(--color-danger)]'>{error}</div>
+          <div className='text-[var(--color-danger)]'>
+            Failed to load product
+          </div>
         </div>
       </div>
     );
