@@ -5,6 +5,7 @@ import { logout } from '../lib/redux/features/authSlice';
 import { useRouter } from 'next/navigation';
 import { getProducts } from '../lib/api';
 import ProductCard from '../components/ProductCard';
+import ProductSkeleton from '../components/ProductSkeleton';
 import type { Product } from '@/types/product';
 
 export default function ProductsPage() {
@@ -81,16 +82,7 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        {loading && (
-          <div className='mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div
-                key={i}
-                className='h-24 rounded-lg bg-[var(--color-bg)] animate-pulse border border-[color:var(--color-accent)]/20'
-              />
-            ))}
-          </div>
-        )}
+        {loading && <ProductSkeleton count={6} />}
         {error && <p className='text-[var(--color-danger)]'>{error}</p>}
         {!loading && !error && Array.isArray(products) && (
           <div className='mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
