@@ -1,6 +1,10 @@
 // Need to use the React-specific entry point to import createApi
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { Product } from '@/types/product';
+import {
+  Product,
+  CreateProductPayload,
+  UpdateProductPayload,
+} from '@/types/product';
 
 // Define a service using a base URL and expected endpoints
 export const productApi = createApi({
@@ -48,7 +52,36 @@ export const productApi = createApi({
       }),
       invalidatesTags: ['Product'],
     }),
+    getProductBySlug: builder.query<Product, string>({
+      query: (slug) => `/products/${slug}`,
+      providesTags: ['Product'],
+    }),
+    createProduct: builder.mutation<Product, CreateProductPayload>({
+      query: (payload) => ({
+        url: '/products',
+        method: 'POST',
+        body: payload,
+      }),
+      invalidatesTags: ['Product'],
+    }),
+    updateProduct: builder.mutation<
+      Product,
+      { id: string; payload: UpdateProductPayload }
+    >({
+      query: ({ id, payload }) => ({
+        url: `/products/${id}`,
+        method: 'PUT',
+        body: payload,
+      }),
+      invalidatesTags: ['Product'],
+    }),
   }),
 });
 
-export const { useGetProductsQuery, useDeleteProductMutation } = productApi;
+export const {
+  useGetProductsQuery,
+  useDeleteProductMutation,
+  useGetProductBySlugQuery,
+  useCreateProductMutation,
+  useUpdateProductMutation,
+} = productApi;

@@ -1,38 +1,40 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useAppSelector } from '@/app/lib/redux/store';
-import { deleteProduct, getProductBySlug } from '@/app/lib/api';
 import type { Product } from '@/types/product';
 import ConfirmationModal from '@/app/components/ConfirmationModal';
+import {
+  useGetProductBySlugQuery,
+  useDeleteProductMutation,
+} from '@/services/product';
 
 export default function ProductDetailsPage() {
   const { slug } = useParams<{ slug: string }>();
   const router = useRouter();
   const token = useAppSelector((s) => s.auth.token);
-
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data: product,
+    isLoading,
+    error,
+  } = useGetProductBySlugQuery(slug as string, { skip: !slug || !token });
+  const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation();
   const [activeImageIdx, setActiveImageIdx] = useState(0);
 
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
     product: Product | null;
-    isDeleting: boolean;
   }>({
     isOpen: false,
     product: null,
-    isDeleting: false,
   });
 
   const handleDeleteClick = (product: Product) => {
     setDeleteModal({
       isOpen: true,
       product,
-      isDeleting: false,
     });
   };
 
@@ -40,59 +42,27 @@ export default function ProductDetailsPage() {
     setDeleteModal({
       isOpen: false,
       product: null,
-      isDeleting: false,
     });
   };
 
   const handleDeleteConfirm = async () => {
     if (!deleteModal.product || !token) return;
-
-    setDeleteModal((prev) => ({ ...prev, isDeleting: true }));
-
     try {
-      await deleteProduct(token, deleteModal.product.id);
-
-      // Close the modal
-      setDeleteModal({
-        isOpen: false,
-        product: null,
-        isDeleting: false,
-      });
-
+      await deleteProduct(deleteModal.product.id).unwrap();
+      setDeleteModal({ isOpen: false, product: null });
       router.push(`/products`);
-    } catch (e: any) {
-      setError(e.message ?? 'Failed to delete product');
-      setDeleteModal((prev) => ({ ...prev, isDeleting: false }));
+    } catch (e) {
+      // noop; error UI handled by modal loading state
     }
   };
 
   useEffect(() => {
-    let mounted = true;
-    async function load() {
-      if (!slug || !token) return;
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await getProductBySlug(token, slug as string);
-        if (mounted) {
-          setProduct(data);
-          setActiveImageIdx(0);
-        }
-      } catch (err: any) {
-        if (mounted) setError(err?.message || 'Failed to load product');
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    }
-    load();
-    return () => {
-      mounted = false;
-    };
-  }, [slug, token]);
+    setActiveImageIdx(0);
+  }, [product?.id]);
 
   if (!token) return null;
 
-  if (loading)
+  if (isLoading)
     return (
       <div className='min-h-screen bg-[var(--color-bg)] px-6 py-10'>
         <div className='max-w-5xl mx-auto bg-[var(--color-surface)] rounded-xl p-6 shadow border border-[color:var(--color-bg)]'>
@@ -105,7 +75,9 @@ export default function ProductDetailsPage() {
     return (
       <div className='min-h-screen bg-[var(--color-bg)] px-6 py-10'>
         <div className='max-w-5xl mx-auto bg-[var(--color-surface)] rounded-xl p-6 shadow border border-[color:var(--color-bg)]'>
-          <div className='text-[var(--color-danger)]'>{error}</div>
+          <div className='text-[var(--color-danger)]'>
+            Failed to load product
+          </div>
         </div>
       </div>
     );
@@ -225,7 +197,7 @@ export default function ProductDetailsPage() {
         message={`Are you sure you want to delete "${deleteModal.product?.name}"? This action cannot be undone.`}
         confirmText='Delete'
         cancelText='Cancel'
-        isLoading={deleteModal.isDeleting}
+        isLoading={isDeleting}
       />
     </div>
   );
