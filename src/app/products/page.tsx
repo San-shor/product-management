@@ -126,6 +126,11 @@ export default function ProductsPage() {
               className='px-4 py-2 rounded-md border border-[color:var(--color-accent)]/40 focus:outline-none w-full sm:w-60'
             />
             <button
+              onClick={() => router.push('/create')}
+              className='px-3 py-2 rounded-md bg-[var(--color-primary)] text-white hover:brightness-95 shrink-0'>
+              Create Product
+            </button>
+            <button
               onClick={handleLogout}
               className='px-3 py-2 rounded-md bg-[var(--color-accent)] text-white hover:brightness-95 shrink-0'>
               Logout
@@ -143,6 +148,7 @@ export default function ProductsPage() {
                 product={p}
                 onDetailsClick={() => alert(String(p.name))}
                 onDeleteClick={handleDeleteClick}
+                onEditClick={(prod) => router.push(`/products/${prod.id}/edit`)}
               />
             ))}
           </div>

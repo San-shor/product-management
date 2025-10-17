@@ -18,3 +18,19 @@ export interface Product {
   createdAt: string; // ISO string
   updatedAt: string; // ISO string
 }
+
+export interface CreateProductPayload {
+  categoryId: string;
+  description: string;
+  images: string[];
+  name: string;
+  price: number;
+}
+
+export interface UpdateProductPayload {
+  description?: string;
+  name?: string;
+  price?: number;
+  images?: string[];
+  categoryId?: string;
+}

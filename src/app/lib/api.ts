@@ -15,6 +15,11 @@ export async function postAuth(email: string) {
 }
 
 import type { Product } from '@/types/product';
+import type {
+  Category,
+  CreateProductPayload,
+  UpdateProductPayload,
+} from '@/types/product';
 
 export async function getProducts(
   token: string,
@@ -60,6 +65,94 @@ export async function deleteProduct(
 
   if (!res.ok) {
     let message = 'Failed to delete product';
+    try {
+      const err = await res.json();
+      if (typeof err?.message === 'string') message = err.message;
+    } catch {}
+    throw new Error(message);
+  }
+
+  return res.json();
+}
+
+export async function getCategories(token: string): Promise<Category[]> {
+  const res = await fetch(`${API_BASE_URL}/categories`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!res.ok) {
+    let message = 'Failed to load categories';
+    try {
+      const err = await res.json();
+      if (typeof err?.message === 'string') message = err.message;
+    } catch {}
+    throw new Error(message);
+  }
+
+  return res.json();
+}
+
+export async function getProductById(
+  token: string,
+  productId: string
+): Promise<Product> {
+  const res = await fetch(`${API_BASE_URL}/products/${productId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!res.ok) {
+    let message = 'Failed to load product';
+    try {
+      const err = await res.json();
+      if (typeof err?.message === 'string') message = err.message;
+    } catch {}
+    throw new Error(message);
+  }
+
+  return res.json();
+}
+
+export async function createProduct(
+  token: string,
+  payload: CreateProductPayload
+): Promise<Product> {
+  const res = await fetch(`${API_BASE_URL}/products`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    let message = 'Failed to create product';
+    try {
+      const err = await res.json();
+      if (typeof err?.message === 'string') message = err.message;
+    } catch {}
+    throw new Error(message);
+  }
+
+  return res.json();
+}
+
+export async function updateProduct(
+  token: string,
+  productId: string,
+  payload: UpdateProductPayload
+): Promise<Product> {
+  const res = await fetch(`${API_BASE_URL}/products/${productId}`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    let message = 'Failed to update product';
     try {
       const err = await res.json();
       if (typeof err?.message === 'string') message = err.message;

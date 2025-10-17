@@ -7,12 +7,14 @@ type ProductCardProps = {
   product: Product;
   onDetailsClick?: (product: Product) => void;
   onDeleteClick?: (product: Product) => void;
+  onEditClick?: (product: Product) => void;
 };
 
 export default function ProductCard({
   product,
   onDetailsClick,
   onDeleteClick,
+  onEditClick,
 }: ProductCardProps) {
   return (
     <div className='rounded-xl overflow-hidden border border-[color:var(--color-accent)]/30 bg-white/80 backdrop-blur hover:shadow-sm hover:-translate-y-0.5 transition'>
@@ -57,6 +59,26 @@ export default function ProductCard({
             <span className='inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[var(--color-accent)]/20 text-[var(--color-text)] text-sm'>
               {String(product?.price ?? '')}
             </span>
+            {onEditClick && (
+              <button
+                onClick={() => onEditClick(product)}
+                className='inline-flex items-center justify-center p-1.5 rounded-md bg-[var(--color-primary)] text-white text-sm'
+                title='Edit product'>
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  viewBox='0 0 24 24'
+                  fill='currentColor'
+                  className='size-6'>
+                  <path d='M16.862 4.487a1.5 1.5 0 0 1 2.122 2.122l-1.2 1.2-2.122-2.122 1.2-1.2Z' />
+                  <path d='M14.69 6.659 6.5 14.848V17.5h2.652l8.189-8.189-2.652-2.652Z' />
+                  <path
+                    fillRule='evenodd'
+                    d='M5 3.75A2.75 2.75 0 0 0 2.25 6.5v11A2.75 2.75 0 0 0 5 20.25h11A2.75 2.75 0 0 0 18.75 17.5v-5a.75.75 0 0 0-1.5 0v5c0 .69-.56 1.25-1.25 1.25H5c-.69 0-1.25-.56-1.25-1.25v-11C3.75 5.81 4.31 5.25 5 5.25h5a.75.75 0 0 0 0-1.5H5Z'
+                    clipRule='evenodd'
+                  />
+                </svg>
+              </button>
+            )}
             {onDeleteClick && (
               <button
                 onClick={() => onDeleteClick(product)}
