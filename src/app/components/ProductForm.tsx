@@ -142,13 +142,9 @@ export default function ProductForm({ mode, initialValues }: ProductFormProps) {
   };
 
   return (
-    <div className='max-w-2xl mx-auto p-4'>
-      <h1 className='text-2xl font-semibold mb-4'>
-        {mode === 'create' ? 'Create Product' : 'Edit Product'}
-      </h1>
-
+    <div>
       {submitError && (
-        <div className='mb-4 rounded bg-red-50 text-red-700 p-3 text-sm'>
+        <div className='mb-4 rounded p-3 text-sm bg-[var(--color-danger)]/10 text-[var(--color-danger)] border border-[var(--color-danger)]/20'>
           {submitError}
         </div>
       )}
@@ -158,25 +154,27 @@ export default function ProductForm({ mode, initialValues }: ProductFormProps) {
           <label className='block text-sm font-medium mb-1'>Name</label>
           <input
             type='text'
-            className='w-full border rounded px-3 py-2'
+            className='w-full rounded-md border border-[color:var(--color-accent)]/40 px-3 py-2 focus:outline-none'
             placeholder='Product name'
             {...register('name')}
           />
           {errors.name && (
-            <p className='text-red-600 text-sm mt-1'>{errors.name.message}</p>
+            <p className='text-[var(--color-danger)] text-sm mt-1'>
+              {errors.name.message}
+            </p>
           )}
         </div>
 
         <div>
           <label className='block text-sm font-medium mb-1'>Description</label>
           <textarea
-            className='w-full border rounded px-3 py-2'
+            className='w-full rounded-md border border-[color:var(--color-accent)]/40 px-3 py-2 focus:outline-none'
             rows={4}
             placeholder='Product description'
             {...register('description')}
           />
           {errors.description && (
-            <p className='text-red-600 text-sm mt-1'>
+            <p className='text-[var(--color-danger)] text-sm mt-1'>
               {errors.description.message}
             </p>
           )}
@@ -187,19 +185,21 @@ export default function ProductForm({ mode, initialValues }: ProductFormProps) {
           <input
             type='number'
             step='0.01'
-            className='w-full border rounded px-3 py-2'
+            className='w-full rounded-md border border-[color:var(--color-accent)]/40 px-3 py-2 focus:outline-none'
             placeholder='0.00'
             {...register('price', { valueAsNumber: true })}
           />
           {errors.price && (
-            <p className='text-red-600 text-sm mt-1'>{errors.price.message}</p>
+            <p className='text-[var(--color-danger)] text-sm mt-1'>
+              {errors.price.message}
+            </p>
           )}
         </div>
 
         <div>
           <label className='block text-sm font-medium mb-1'>Category</label>
           <select
-            className='w-full border rounded px-3 py-2 bg-white'
+            className='w-full rounded-md border border-[color:var(--color-accent)]/40 px-3 py-2 bg-white focus:outline-none'
             disabled={loadingCategories}
             {...register('categoryId')}>
             <option value=''>Select a category</option>
@@ -210,7 +210,7 @@ export default function ProductForm({ mode, initialValues }: ProductFormProps) {
             ))}
           </select>
           {errors.categoryId && (
-            <p className='text-red-600 text-sm mt-1'>
+            <p className='text-[var(--color-danger)] text-sm mt-1'>
               {errors.categoryId.message}
             </p>
           )}
@@ -235,13 +235,13 @@ export default function ProductForm({ mode, initialValues }: ProductFormProps) {
               <div key={index} className='flex gap-2'>
                 <input
                   type='url'
-                  className='flex-1 border rounded px-3 py-2'
+                  className='flex-1 rounded-md border border-[color:var(--color-accent)]/40 px-3 py-2 focus:outline-none'
                   placeholder='https://...'
                   {...register(`images.${index}` as const)}
                 />
                 <button
                   type='button'
-                  className='border rounded px-2'
+                  className='border rounded-md px-2'
                   onClick={() =>
                     setValue(
                       'images',
@@ -255,7 +255,7 @@ export default function ProductForm({ mode, initialValues }: ProductFormProps) {
             ))}
           </div>
           {errors.images && (
-            <p className='text-red-600 text-sm mt-1'>
+            <p className='text-[var(--color-danger)] text-sm mt-1'>
               {errors.images.message as string}
             </p>
           )}
@@ -265,7 +265,7 @@ export default function ProductForm({ mode, initialValues }: ProductFormProps) {
           <button
             type='submit'
             disabled={isSubmitting}
-            className='px-4 py-2 rounded bg-black text-white disabled:opacity-60'>
+            className='px-3 py-2 rounded-md bg-[var(--color-primary)] text-white hover:brightness-95 disabled:opacity-50'>
             {isSubmitting
               ? 'Submitting...'
               : mode === 'create'

@@ -92,11 +92,11 @@ export async function getCategories(token: string): Promise<Category[]> {
   return res.json();
 }
 
-export async function getProductById(
+export async function getProductBySlug(
   token: string,
-  productId: string
+  productSlug: string
 ): Promise<Product> {
-  const res = await fetch(`${API_BASE_URL}/products/${productId}`, {
+  const res = await fetch(`${API_BASE_URL}/products/${productSlug}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -143,7 +143,7 @@ export async function updateProduct(
   payload: UpdateProductPayload
 ): Promise<Product> {
   const res = await fetch(`${API_BASE_URL}/products/${productId}`, {
-    method: 'PATCH',
+    method: 'PUT',
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
