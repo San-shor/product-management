@@ -7,7 +7,6 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAppSelector } from '@/app/lib/redux/store';
 import type { Category, Product } from '@/types/product';
-import { getCategories } from '@/app/lib/api';
 import type {
   CreateProductPayload,
   UpdateProductPayload,
@@ -17,6 +16,7 @@ import {
   useCreateProductMutation,
   useUpdateProductMutation,
 } from '@/services/product';
+import { useGetCategoriesQuery } from '@/services/category';
 
 type ProductFormMode = 'create' | 'edit';
 
@@ -62,8 +62,14 @@ export default function ProductForm({ mode, initialValues }: ProductFormProps) {
   const [createProductMutation] = useCreateProductMutation();
   const [updateProductMutation] = useUpdateProductMutation();
 
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loadingCategories, setLoadingCategories] = useState<boolean>(true);
+  const {
+    data: categories = [],
+    isLoading: loadingCategories,
+    error: categoriesError,
+  } = useGetCategoriesQuery(undefined, {
+    skip: !token,
+  });
+
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const defaultValues: FormValues = useMemo(
@@ -93,26 +99,12 @@ export default function ProductForm({ mode, initialValues }: ProductFormProps) {
 
   const images = watch('images');
 
+  // Set error if categories fail to load
   useEffect(() => {
-    let mounted = true;
-    async function loadCategories() {
-      setLoadingCategories(true);
-      try {
-        if (!token) throw new Error('Missing auth token');
-        const data = await getCategories(token);
-        if (mounted) setCategories(data);
-      } catch (err: any) {
-        if (mounted)
-          setSubmitError(err?.message || 'Failed to load categories');
-      } finally {
-        if (mounted) setLoadingCategories(false);
-      }
+    if (categoriesError) {
+      setSubmitError('Failed to load categories');
     }
-    loadCategories();
-    return () => {
-      mounted = false;
-    };
-  }, [token]);
+  }, [categoriesError]);
 
   const onSubmit = async (values: FormValues) => {
     if (!token) {
