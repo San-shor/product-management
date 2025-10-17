@@ -7,12 +7,16 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAppSelector } from '@/app/lib/redux/store';
 import type { Category, Product } from '@/types/product';
-import { createProduct, getCategories, updateProduct } from '@/app/lib/api';
+import { getCategories } from '@/app/lib/api';
 import type {
   CreateProductPayload,
   UpdateProductPayload,
 } from '@/types/product';
 import { useRouter } from 'next/navigation';
+import {
+  useCreateProductMutation,
+  useUpdateProductMutation,
+} from '@/services/product';
 
 type ProductFormMode = 'create' | 'edit';
 
@@ -55,6 +59,8 @@ type FormValues = z.infer<typeof formSchema>;
 export default function ProductForm({ mode, initialValues }: ProductFormProps) {
   const router = useRouter();
   const token = useAppSelector((s) => s.auth.token);
+  const [createProductMutation] = useCreateProductMutation();
+  const [updateProductMutation] = useUpdateProductMutation();
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [loadingCategories, setLoadingCategories] = useState<boolean>(true);
@@ -123,7 +129,7 @@ export default function ProductForm({ mode, initialValues }: ProductFormProps) {
           categoryId: values.categoryId,
           images: values.images.map((u) => u.trim()),
         };
-        await createProduct(token, payload);
+        await createProductMutation(payload).unwrap();
       } else if (mode === 'edit' && initialValues?.id) {
         const payload: UpdateProductPayload = {
           name: values.name.trim(),
@@ -132,7 +138,7 @@ export default function ProductForm({ mode, initialValues }: ProductFormProps) {
           categoryId: values.categoryId,
           images: values.images.map((u) => u.trim()),
         };
-        await updateProduct(token, initialValues.id, payload);
+        await updateProductMutation({ id: initialValues.id, payload }).unwrap();
       }
       router.push('/products');
       router.refresh();
