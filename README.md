@@ -85,9 +85,9 @@ src/
     products/[slug]/edit/        # Edit product
     create/page.tsx              # Create product
     components/                  # UI components (cards, forms, modal, skeleton)
-    lib/api.ts                   # API client & endpoints
     lib/redux/                   # Redux store & slices
     storeProvider.tsx            # Redux Provider for App Router
+  services/                      # RTK Query API services
   types/product.ts               # Shared types
 ```
 
@@ -111,7 +111,7 @@ src/
 
 ## Configuration
 
-- API base URL is hardcoded in `src/app/lib/api.ts` as `API_BASE_URL`. Change this to point to your backend if needed.
+- API base URL is configured in RTK Query services (`src/services/`) as `baseUrl`. Change this to point to your backend if needed.
 - Tailwind CSS is set up via `postcss.config.mjs` and the default `globals.css`.
 
 ---
