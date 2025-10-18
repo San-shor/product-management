@@ -2,21 +2,32 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAppDispatch, useAppSelector } from '../lib/redux/store';
-import { loginUser } from '../lib/redux/features/authSlice';
+import { useAppDispatch } from '../lib/redux/store';
+import { setToken } from '../lib/redux/features/authSlice';
+import { useGetAuthTokenMutation } from '@/services/auth';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const dispatch = useAppDispatch();
-  const { loading, error, token } = useAppSelector((state) => state.auth);
   const router = useRouter();
+
+  const [getAuthToken, { isLoading, isError, error }] =
+    useGetAuthTokenMutation();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const result = await dispatch(loginUser(email));
-    if (loginUser.fulfilled.match(result)) router.push('/products');
+    try {
+      const result = await getAuthToken(email).unwrap();
+      if (result.token) {
+        // Save token to Redux state
+        dispatch(setToken(result.token));
+        router.push('/products');
+      }
+    } catch (err) {
+      // Error handling is already done by RTK Query
+      console.error('Login failed:', err);
+    }
   };
-
   return (
     <div className='min-h-screen flex items-center justify-center bg-[var(--color-bg)]'>
       <form
@@ -37,18 +48,17 @@ export default function LoginPage() {
           className='w-full border border-[color:var(--color-accent)]/40 rounded-md px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]'
           placeholder='you@example.com'
         />
-
-        {error && (
+        {isError && (
           <p className='text-[var(--color-danger)] text-sm mb-3 text-center'>
-            {error}
+            Error: {(error as any)?.message || 'Something went wrong.'}
           </p>
         )}
 
         <button
           type='submit'
-          disabled={loading}
+          disabled={isLoading}
           className='w-full bg-[var(--color-primary)] text-white py-2 rounded-md hover:brightness-95 transition disabled:opacity-50'>
-          {loading ? 'Signing in...' : 'Sign In'}
+          {isLoading ? 'Signing in...' : 'Sign In'}
         </button>
       </form>
     </div>
