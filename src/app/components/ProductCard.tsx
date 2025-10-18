@@ -17,88 +17,124 @@ export default function ProductCard({
   onEditClick,
 }: ProductCardProps) {
   return (
-    <div className='rounded-xl overflow-hidden border border-[color:var(--color-accent)]/30 bg-white/80 backdrop-blur hover:shadow-sm hover:-translate-y-0.5 transition'>
-      <div className='relative aspect-[4/3] bg-[var(--color-bg)]'>
+    <div className='group relative bg-[var(--color-surface)] rounded-2xl shadow-sm border border-[var(--color-accent)]/20 overflow-hidden hover:shadow-xl hover:shadow-[var(--color-accent)]/10 hover:-translate-y-1 transition-all duration-300 ease-out'>
+      {/* Image Container */}
+      <div className='relative aspect-[4/3] bg-gradient-to-br from-[var(--color-bg)] to-[var(--color-accent)]/10 overflow-hidden'>
         {Array.isArray(product.images) &&
-          product.images.length > 0 &&
-          typeof product.images[0] === 'string' &&
-          product.images[0].length > 0 && (
-            <Image
-              src={product.images[0]}
-              alt={String(product.name || 'Product image')}
-              fill
-              sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
-              className='object-cover'
-              priority={false}
-              unoptimized
-            />
-          )}
-      </div>
-
-      <div className='p-4'>
-        <div className='flex items-start justify-between gap-3'>
-          <div className='font-medium text-[var(--color-text)] line-clamp-1'>
-            {product.name}
+        product.images.length > 0 &&
+        typeof product.images[0] === 'string' &&
+        product.images[0].length > 0 ? (
+          <Image
+            src={product.images[0]}
+            alt={String(product.name || 'Product image')}
+            fill
+            sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
+            className='object-cover group-hover:scale-105 transition-transform duration-300 ease-out'
+            priority={false}
+            unoptimized
+          />
+        ) : (
+          <div className='flex items-center justify-center h-full text-[var(--color-accent)]/60'>
+            <svg
+              className='w-12 h-12'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'>
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={1.5}
+                d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z'
+              />
+            </svg>
           </div>
-          <span className='shrink-0 text-xs px-2 py-0.5 rounded-full bg-[var(--color-accent)]/15 text-[var(--color-text)]'>
-            {product?.category?.name ?? '—'}
+        )}
+
+        {/* Category Badge */}
+        <div className='absolute top-3 left-3'>
+          <span className='inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[var(--color-surface)]/95 backdrop-blur-sm text-[var(--color-text)] shadow-sm border border-[var(--color-accent)]/20'>
+            {product?.category?.name ?? 'Uncategorized'}
           </span>
         </div>
 
-        <div className='mt-3 flex items-center justify-between'>
+        {/* Action Buttons Overlay */}
+        <div className='absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200'>
+          <div className='flex gap-1.5'>
+            {onEditClick && (
+              <button
+                onClick={() => onEditClick(product)}
+                className='p-1.5 rounded-lg bg-[var(--color-surface)]/95 backdrop-blur-sm text-[var(--color-primary)] hover:text-[var(--color-primary)] hover:bg-[var(--color-surface)] transition-colors duration-200 shadow-lg border border-[var(--color-accent)]/20 ring-1 ring-[var(--color-surface)]/50'>
+                <svg
+                  className='w-4 h-4'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'>
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'
+                  />
+                </svg>
+              </button>
+            )}
+            {onDeleteClick && (
+              <button
+                onClick={() => onDeleteClick(product)}
+                className='p-1.5 rounded-lg bg-[var(--color-surface)]/95 backdrop-blur-sm text-[var(--color-danger)] hover:text-[var(--color-danger)] hover:bg-[var(--color-surface)] transition-colors duration-200 shadow-lg border border-[var(--color-accent)]/20 ring-1 ring-[var(--color-surface)]/50'>
+                <svg
+                  className='w-4 h-4'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'>
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16'
+                  />
+                </svg>
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className='p-5'>
+        {/* Product Name */}
+        <h3 className='font-semibold text-[var(--color-text)] text-lg leading-tight mb-2 line-clamp-2 group-hover:text-[var(--color-primary)] transition-colors duration-200'>
+          {product.name}
+        </h3>
+
+        {/* Description Preview */}
+        {product.description && (
+          <p className='text-[var(--color-text)]/70 text-sm leading-relaxed mb-4 line-clamp-2'>
+            {product.description}
+          </p>
+        )}
+
+        {/* Bottom Section */}
+        <div className='flex items-center justify-between'>
+          {/* Price */}
+          <div className='flex items-baseline gap-1'>
+            <span className='text-2xl font-bold text-[var(--color-text)]'>
+              ${String(product?.price ?? '0')}
+            </span>
+            <span className='text-sm text-[var(--color-text)]/60'>USD</span>
+          </div>
+
+          {/* Details Button */}
           <Button
             size='sm'
             onClick={() =>
               onDetailsClick
                 ? onDetailsClick(product)
                 : alert(product.description)
-            }>
-            Details
+            }
+            className='bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 text-[var(--color-surface)] px-4 py-2 rounded-lg font-medium text-sm transition-colors duration-200 shadow-sm hover:shadow-md'>
+            View Details
           </Button>
-
-          <div className='flex items-center gap-2'>
-            <span className='inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[var(--color-accent)]/20 text-[var(--color-text)] text-sm'>
-              {String(product?.price ?? '')}
-            </span>
-            {onEditClick && (
-              <Button
-                onClick={() => onEditClick(product)}
-                size='sm'
-                variant='secondary'>
-                <svg
-                  xmlns='http://www.w3.org/2000/svg'
-                  viewBox='0 0 24 24'
-                  fill='currentColor'
-                  className='size-6'>
-                  <path d='M16.862 4.487a1.5 1.5 0 0 1 2.122 2.122l-1.2 1.2-2.122-2.122 1.2-1.2Z' />
-                  <path d='M14.69 6.659 6.5 14.848V17.5h2.652l8.189-8.189-2.652-2.652Z' />
-                  <path
-                    fillRule='evenodd'
-                    d='M5 3.75A2.75 2.75 0 0 0 2.25 6.5v11A2.75 2.75 0 0 0 5 20.25h11A2.75 2.75 0 0 0 18.75 17.5v-5a.75.75 0 0 0-1.5 0v5c0 .69-.56 1.25-1.25 1.25H5c-.69 0-1.25-.56-1.25-1.25v-11C3.75 5.81 4.31 5.25 5 5.25h5a.75.75 0 0 0 0-1.5H5Z'
-                    clipRule='evenodd'
-                  />
-                </svg>
-              </Button>
-            )}
-            {onDeleteClick && (
-              <Button
-                onClick={() => onDeleteClick(product)}
-                size='sm'
-                variant='danger'>
-                <svg
-                  xmlns='http://www.w3.org/2000/svg'
-                  viewBox='0 0 24 24'
-                  fill='currentColor'
-                  className='size-6'>
-                  <path
-                    fillRule='evenodd'
-                    d='M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z'
-                    clipRule='evenodd'
-                  />
-                </svg>
-              </Button>
-            )}
-          </div>
         </div>
       </div>
     </div>
