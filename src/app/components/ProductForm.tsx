@@ -83,7 +83,6 @@ export default function ProductForm({ mode, initialValues }: ProductFormProps) {
   );
 
   const {
-    control,
     register,
     handleSubmit,
     formState: { errors, isSubmitting },

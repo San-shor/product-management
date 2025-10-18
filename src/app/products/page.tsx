@@ -81,7 +81,7 @@ export default function ProductsPage() {
         isOpen: false,
         product: null,
       });
-    } catch (e: any) {
+    } catch (_) {
       setDeleteModal((prev) => ({ ...prev, isDeleting: false }));
     }
   };

@@ -18,7 +18,6 @@ export default function ConfirmationModal({
   onClose,
   onConfirm,
   title,
-  message,
   confirmText = 'Confirm',
   cancelText = 'Cancel',
   isLoading = false,
