@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAppDispatch } from '../lib/redux/store';
-import { setToken } from '../lib/redux/features/authSlice';
 import { useGetAuthTokenMutation } from '@/services/auth';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import Button from '../components/Button';
+import { setToken } from '../lib/redux/features/authSlice';
+import { useAppDispatch } from '../lib/redux/store';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -54,12 +55,9 @@ export default function LoginPage() {
           </p>
         )}
 
-        <button
-          type='submit'
-          disabled={isLoading}
-          className='w-full bg-[var(--color-primary)] text-white py-2 rounded-md hover:brightness-95 transition disabled:opacity-50'>
+        <Button type='submit' disabled={isLoading}>
           {isLoading ? 'Signing in...' : 'Sign In'}
-        </button>
+        </Button>
       </form>
     </div>
   );

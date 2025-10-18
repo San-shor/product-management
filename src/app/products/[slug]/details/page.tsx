@@ -1,15 +1,15 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
-import { useParams, useRouter } from 'next/navigation';
-import { useAppSelector } from '@/app/lib/redux/store';
-import type { Product } from '@/types/product';
+import Button from '@/app/components/Button';
 import ConfirmationModal from '@/app/components/ConfirmationModal';
+import { useAppSelector } from '@/app/lib/redux/store';
 import {
-  useGetProductBySlugQuery,
   useDeleteProductMutation,
+  useGetProductBySlugQuery,
 } from '@/services/product';
+import type { Product } from '@/types/product';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function ProductDetailsPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -103,11 +103,9 @@ export default function ProductDetailsPage() {
           <h1 className='text-2xl font-semibold text-[var(--color-text)]'>
             {product.name}
           </h1>
-          <button
-            onClick={() => router.push('/products')}
-            className='px-3 py-2 rounded-md bg-[var(--color-accent)] text-white hover:brightness-95'>
+          <Button onClick={() => router.push('/products')} variant='secondary'>
             Back to Products
-          </button>
+          </Button>
         </div>
 
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
@@ -125,7 +123,7 @@ export default function ProductDetailsPage() {
                 <button
                   key={idx}
                   onClick={() => setActiveImageIdx(idx)}
-                  className={`relative aspect-square overflow-hidden rounded-md border ${
+                  className={`relative aspect-square overflow-hidden rounded-md border cursor-pointer ${
                     idx === activeImageIdx
                       ? 'border-[var(--color-primary)]'
                       : 'border-[color:var(--color-accent)]/30'
@@ -161,17 +159,17 @@ export default function ProductDetailsPage() {
             </div>
 
             <div className='flex gap-3 pt-2'>
-              <button
+              <Button
                 onClick={() => handleDeleteClick(product)}
-                className='inline-flex items-center justify-center px-4 py-2 rounded-md bg-[var(--color-danger)] text-white text-sm'
-                title='Delete product'>
+                variant='danger'
+                size='sm'>
                 Delete
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => router.push(`/products/${product.slug}/edit`)}
-                className='px-4 py-2 rounded-md border border-[color:var(--color-accent)]/40 hover:bg-[color:var(--color-accent)]/5'>
-                Edit Product
-              </button>
+                size='sm'>
+                Edit
+              </Button>
             </div>
 
             <div className='mt-6 grid grid-cols-2 gap-4 text-sm'>

@@ -1,5 +1,6 @@
 'use client';
-import React from 'react';
+
+import Button from './Button';
 
 type ConfirmationModalProps = {
   isOpen: boolean;
@@ -26,16 +27,12 @@ export default function ConfirmationModal({
 
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center'>
-      {/* Backdrop */}
       <div
         className='absolute inset-0 bg-black/50 backdrop-blur-sm'
         onClick={onClose}
       />
-
-      {/* Modal */}
       <div className='relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 max-w-md w-full mx-4'>
         <div className='p-6'>
-          {/* Header */}
           <div className='flex items-center gap-3 mb-4'>
             <div className='flex-shrink-0'>
               <svg
@@ -55,25 +52,19 @@ export default function ConfirmationModal({
               {title}
             </h3>
           </div>
-
-          {/* Message */}
           <p className='text-gray-600 dark:text-gray-300 mb-6'>
             Are you sure you want to delete this product ? This action cannot be
             undone.
           </p>
-
-          {/* Actions */}
           <div className='flex gap-3 justify-end'>
-            <button
-              onClick={onClose}
-              disabled={isLoading}
-              className='px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors'>
+            <Button onClick={onClose} disabled={isLoading}>
               {cancelText}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={onConfirm}
               disabled={isLoading}
-              className='px-4 py-2 text-sm font-medium text-white bg-red-600 border border-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2'>
+              variant='danger'
+              size='md'>
               {isLoading && (
                 <svg
                   className='w-4 h-4 animate-spin'
@@ -89,7 +80,7 @@ export default function ConfirmationModal({
                 </svg>
               )}
               {confirmText}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

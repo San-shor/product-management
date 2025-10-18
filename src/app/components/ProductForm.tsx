@@ -1,22 +1,21 @@
 'use client';
 
-import React from 'react';
-import { useEffect, useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useAppSelector } from '@/app/lib/redux/store';
-import type { Category, Product } from '@/types/product';
-import type {
-  CreateProductPayload,
-  UpdateProductPayload,
-} from '@/types/product';
-import { useRouter } from 'next/navigation';
+import { useGetCategoriesQuery } from '@/services/category';
 import {
   useCreateProductMutation,
   useUpdateProductMutation,
 } from '@/services/product';
-import { useGetCategoriesQuery } from '@/services/category';
+import type {
+  CreateProductPayload,
+  UpdateProductPayload,
+} from '@/types/product';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import Button from './Button';
 
 type ProductFormMode = 'create' | 'edit';
 
@@ -217,16 +216,16 @@ export default function ProductForm({ mode, initialValues }: ProductFormProps) {
         <div>
           <div className='flex items-center justify-between mb-1'>
             <label className='block text-sm font-medium'>Images</label>
-            <button
+            <Button
               type='button'
-              className='text-sm text-blue-600'
+              size='sm'
               onClick={() =>
                 setValue('images', [...(images || []), ''], {
                   shouldValidate: true,
                 })
               }>
               Add
-            </button>
+            </Button>
           </div>
           <div className='space-y-2'>
             {(images || []).map((_, index) => (
@@ -237,9 +236,10 @@ export default function ProductForm({ mode, initialValues }: ProductFormProps) {
                   placeholder='https://...'
                   {...register(`images.${index}` as const)}
                 />
-                <button
+                <Button
                   type='button'
-                  className='border rounded-md px-2'
+                  variant='danger'
+                  size='sm'
                   onClick={() =>
                     setValue(
                       'images',
@@ -248,7 +248,7 @@ export default function ProductForm({ mode, initialValues }: ProductFormProps) {
                     )
                   }>
                   Remove
-                </button>
+                </Button>
               </div>
             ))}
           </div>
@@ -260,16 +260,13 @@ export default function ProductForm({ mode, initialValues }: ProductFormProps) {
         </div>
 
         <div className='pt-2'>
-          <button
-            type='submit'
-            disabled={isSubmitting}
-            className='px-3 py-2 rounded-md bg-[var(--color-primary)] text-white hover:brightness-95 disabled:opacity-50'>
+          <Button type='submit' disabled={isSubmitting}>
             {isSubmitting
               ? 'Submitting...'
               : mode === 'create'
               ? 'Create'
               : 'Update'}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

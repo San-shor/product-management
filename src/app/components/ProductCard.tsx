@@ -1,7 +1,7 @@
 'use client';
-import React from 'react';
-import Image from 'next/image';
 import type { Product } from '@/types/product';
+import Image from 'next/image';
+import Button from './Button';
 
 type ProductCardProps = {
   product: Product;
@@ -46,24 +46,25 @@ export default function ProductCard({
         </div>
 
         <div className='mt-3 flex items-center justify-between'>
-          <button
+          <Button
+            size='sm'
             onClick={() =>
               onDetailsClick
                 ? onDetailsClick(product)
                 : alert(product.description)
-            }
-            className='inline-flex items-center justify-center px-3 py-1.5 rounded-md bg-[var(--color-primary)] text-white text-sm hover:brightness-95'>
+            }>
             Details
-          </button>
+          </Button>
+
           <div className='flex items-center gap-2'>
             <span className='inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[var(--color-accent)]/20 text-[var(--color-text)] text-sm'>
               {String(product?.price ?? '')}
             </span>
             {onEditClick && (
-              <button
+              <Button
                 onClick={() => onEditClick(product)}
-                className='inline-flex items-center justify-center p-1.5 rounded-md bg-[var(--color-primary)] text-white text-sm'
-                title='Edit product'>
+                size='sm'
+                variant='secondary'>
                 <svg
                   xmlns='http://www.w3.org/2000/svg'
                   viewBox='0 0 24 24'
@@ -77,13 +78,13 @@ export default function ProductCard({
                     clipRule='evenodd'
                   />
                 </svg>
-              </button>
+              </Button>
             )}
             {onDeleteClick && (
-              <button
+              <Button
                 onClick={() => onDeleteClick(product)}
-                className='inline-flex items-center justify-center p-1.5 rounded-md bg-[var(--color-danger)] text-white text-sm'
-                title='Delete product'>
+                size='sm'
+                variant='danger'>
                 <svg
                   xmlns='http://www.w3.org/2000/svg'
                   viewBox='0 0 24 24'
@@ -95,7 +96,7 @@ export default function ProductCard({
                     clipRule='evenodd'
                   />
                 </svg>
-              </button>
+              </Button>
             )}
           </div>
         </div>
