@@ -1,11 +1,10 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import Header from '@/app/components/Header';
 import ProductForm from '@/app/components/ProductForm';
 import { useAppSelector } from '@/app/lib/redux/store';
-import type { Product } from '@/types/product';
 import { useGetProductBySlugQuery } from '@/services/product';
+import { useParams } from 'next/navigation';
 
 export default function EditProductPage() {
   const params = useParams<{ slug: string }>();
@@ -39,6 +38,7 @@ export default function EditProductPage() {
   if (error)
     return (
       <div className='min-h-screen bg-[var(--color-bg)] px-6 py-10'>
+        <Header />
         <div className='max-w-5xl mx-auto bg-[var(--color-surface)] rounded-xl p-6 shadow border border-[color:var(--color-bg)]'>
           <div className='text-[var(--color-danger)]'>
             Failed to load product

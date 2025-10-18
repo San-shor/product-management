@@ -96,12 +96,12 @@ export default function ProductsPage() {
   if (!token) return null;
 
   return (
-    <div className='min-h-screen bg-[var(--color-bg)] px-6 py-10'>
+    <div className='min-h-screen  px-6 py-10'>
       <Header />
-      <div className='max-w-5xl mx-auto bg-[var(--color-surface)] rounded-xl p-6 shadow border border-[color:var(--color-bg)]'>
+      <div className='max-w-5xl mx-auto'>
         <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4 mb-6'>
           <h1 className='text-2xl font-semibold text-[var(--color-text)]'>
-            Products
+            All Products
           </h1>
 
           <div className='flex w-full sm:w-auto gap-3'>
@@ -135,6 +135,11 @@ export default function ProductsPage() {
                 }
               />
             ))}
+            {products.length < 1 && (
+              <div className='mt-10 text-center text-sm opacity-70'>
+                No products found.
+              </div>
+            )}
           </div>
         )}
 
